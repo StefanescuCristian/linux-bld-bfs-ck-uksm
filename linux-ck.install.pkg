@@ -1,5 +1,5 @@
 KERNEL_NAME=-ck
-KERNEL_VERSION=3.10.4-1-ck
+KERNEL_VERSION=3.10.4-1-harfmix
 
 post_install () {
 	# updating module dependencies

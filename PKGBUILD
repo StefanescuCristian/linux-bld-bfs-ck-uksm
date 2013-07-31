@@ -54,7 +54,7 @@ _NUMAdisable=y  # Disable NUMA in kernel config
 
 pkgname=linux-ck
 true && pkgname=(linux-ck linux-ck-headers)
-_kernelname=-ck
+_kernelname=-harfmix
 _srcname=linux-3.10
 pkgver=3.10.4
 pkgrel=1
@@ -226,6 +226,10 @@ build() {
   # save configuration for later reuse
   if [ "${CARCH}" = "x86_64" ]; then
     cat .config > "${startdir}/config.x86_64.last"
+	sed -e 's/CONFIG_GENERIC_CPU=y/# CONFIG_GENERIC_CPU is not set/' -e 's/# CONFIG_MCOREAVX2 is not set/CONFIG_MCOREAVX2=y/' \
+-e 's/CONFIG_X86_WP_WORKS_OK=y/CONFIG_X86_WP_WORKS_OK=y\nCONFIG_X86_INTEL_USERCOPY=y\nCONFIG_X86_USE_PPRO_CHECKSUM=y\nCONFIG_X86_P6_NOP=y/' .config > .config.tmp
+	mv -f .config.tmp .config
+	exit 1
   else
     cat .config > "${startdir}/config.last"
   fi
