@@ -6,8 +6,8 @@
 # Set these variables to ANYTHING that is not null (y or hello or 2 or "I like icecream") to enable them
 #
 _pstates_pat=y   # Enable Haswell support for the new Intel pstate drive
-_makenconfig=   # Tweak kernel options prior to a build via nconfig
-_localmodcfg=y   # Compile ONLY probed modules
+_makenconfig=y   # Tweak kernel options prior to a build via nconfig
+_localmodcfg=   # Compile ONLY probed modules
 _use_current=y   # Use the current kernel's .config file
 _BFQ_enable_=y   # Enable BFQ as the default I/O scheduler
 _NUMAdisable=y  # Disable NUMA in kernel config
