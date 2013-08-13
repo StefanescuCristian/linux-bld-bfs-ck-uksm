@@ -5,10 +5,10 @@
 ### PATCH AND BUILD OPTIONS
 # Set these variables to ANYTHING that is not null (y or hello or 2 or "I like icecream") to enable them
 #
-_pstates_pat=   # Enable Haswell support for the new Intel pstate drive
+_pstates_pat=y   # Enable Haswell support for the new Intel pstate drive
 _makenconfig=   # Tweak kernel options prior to a build via nconfig
 _localmodcfg=y   # Compile ONLY probed modules
-_use_current=   # Use the current kernel's .config file
+_use_current=y   # Use the current kernel's .config file
 _BFQ_enable_=y   # Enable BFQ as the default I/O scheduler
 _NUMAdisable=y  # Disable NUMA in kernel config
 
@@ -56,7 +56,7 @@ pkgname=linux-ck
 true && pkgname=(linux-ck linux-ck-headers)
 _kernelname=-harfmix
 _srcname=linux-3.10
-pkgver=3.10.4
+pkgver=3.10.6
 pkgrel=1
 arch=('i686' 'x86_64')
 url="https://wiki.archlinux.org/index.php/Linux-ck"
@@ -65,8 +65,19 @@ makedepends=('kmod' 'inetutils' 'bc')
 options=('!strip')
 _ckpatchversion=1
 _ckpatchname="patch-3.10-ck${_ckpatchversion}"
-_gcc_patch="kernel-310-gcc48-1.patch"
-_bfqpath="http://algo.ing.unimo.it/people/paolo/disk_sched/patches/3.10.0-v6r2"
+_gcc_patch="kernel-310-gcc48-2.patch"
+_kbase=3.10
+_kpatch=3.10.0
+_bfqversion=v6r2
+_bfqpath="http://algo.ing.unimo.it/people/paolo/disk_sched/patches/$_kpatch-$_bfqversion"
+_kpatchsum=$(sha256sum patch-$pkgver.xz | awk '{print $1}')
+_kbasesum=$(sha256sum $_srcname.tar.xz | awk '{print $1}')
+_cksum=$(sha256sum ${_ckpatchname}.bz2 | awk '{print $1}')
+_gccsum=$(sha256sum $_gcc_patch.gz | awk '{print $1}')
+sed -i "95s/.*/\'$_kbasesum\'/g" PKGBUILD
+sed -i "96s/.*/\'$_kpatchsum\'/g" PKGBUILD
+sed -i "97s/.*/\'$_cksum\'/g" PKGBUILD
+sed -i "98s/.*/\'$_gccsum\'/g" PKGBUILD
 source=("http://www.kernel.org/pub/linux/kernel/v3.x/${_srcname}.tar.xz"
 "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
 "http://ck.kolivas.org/patches/3.0/3.10/3.10-ck${_ckpatchversion}/${_ckpatchname}.bz2"
@@ -75,25 +86,27 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/${_srcname}.tar.xz"
 'linux-ck.preset'
 'change-default-console-loglevel.patch'
 'config' 'config.x86_64'
-"${_bfqpath}/0001-block-cgroups-kconfig-build-bits-for-BFQ-v6r2-3.10.patch"
-"${_bfqpath}/0002-block-introduce-the-BFQ-v6r2-I-O-sched-for-3.10.patch"
-"${_bfqpath}/0003-block-bfq-add-Early-Queue-Merge-EQM-to-BFQ-v6r2-for-3.10.0.patch"
-"https://bld.googlecode.com/files/bld-3.10.0.patch"
-"https://raw.github.com/sergiuniculescu/configs/master/kernel%20patch/uksm/uksm-0.1.2.2-for-v3.10.patch")
-sha256sums=('df27fa92d27a9c410bfe6c4a89f141638500d7eadcca5cce578954efc2ad3544'
-            'd8ef39930663cc916e57e06b308a1654f2a03903a3c5a0d3a5503c6d58e2b2b8'
-            '747d893b69d040dd82650a1a2d509155beace337020619194661049920650ed6'
-            '16c9eab6e83f0f4f035d8f52e17791115d8c01c6199a21525cb2f583aec61b03'
-            'd7fada52453d12a24af9634024c36792697f97ce0bc6552939cd7b2344d00cd9'
-            'c2cf8cc2600502de348f3dc3aae9a3bde5486759db15cb8a93df7aa35bd6e7da'
-            '56bd99e54429a25a144f2d221718b67f516344ffd518fd7dcdd752206ec5be69'
-            '059a8511042a188d283057d3fb27077f3833d987a1b2e3ef4c5bed065184acb3'
-            'e6fe236c96aff5f16dea24ef70fdc36fdd016ee1d63887f35ae698c31cc8a77f'
-            'cbe62e86c49dee2430b491295d83c5d08c2e068728f30a0fb714dbaccdd0f48c'
-            '4b5a2136f5a84e541f4de1961a5eee0943f0489b7619746d24ac64a118ca4840'
-            'bce5d8d04ae8384268cad836a70a103bf3c2464acb3c55aa773fb852e2f49036'
-			'8921194e1bfcb377d09cee2652f97f695b1fa79a4c22caa0b95dba04d93b99be'
-			'54f94f5f5a7ba560543d77a182def02a06638ea613a60b97065f76370f3beb40')
+"${_bfqpath}/0001-block-cgroups-kconfig-build-bits-for-BFQ-$_bfqversion-$_kbase.patch"
+"${_bfqpath}/0002-block-introduce-the-BFQ-$_bfqversion-I-O-sched-for-$_kbase.patch"
+"${_bfqpath}/0003-block-bfq-add-Early-Queue-Merge-EQM-to-BFQ-$_bfqversion-for-$_kpatch.patch"
+"https://bld.googlecode.com/files/bld-$_kpatch.patch"
+"https://raw.github.com/sergiuniculescu/configs/master/kernel%20patch/uksm/uksm-0.1.2.2-for-v$_kbase.patch")
+sha256sums=(
+'df27fa92d27a9c410bfe6c4a89f141638500d7eadcca5cce578954efc2ad3544'
+'e17be1ccd6b904d70e3be2b61c16bd4346272c86b5ee1a12ab8d80dcdc7b1487'
+'747d893b69d040dd82650a1a2d509155beace337020619194661049920650ed6'
+'d5fd60f5fae0813eb398b3eac410ce65b8b958360300aa66e1597dc16e9dfe78'
+'d7fada52453d12a24af9634024c36792697f97ce0bc6552939cd7b2344d00cd9'
+'c2cf8cc2600502de348f3dc3aae9a3bde5486759db15cb8a93df7aa35bd6e7da'
+'56bd99e54429a25a144f2d221718b67f516344ffd518fd7dcdd752206ec5be69'
+'059a8511042a188d283057d3fb27077f3833d987a1b2e3ef4c5bed065184acb3'
+'e6fe236c96aff5f16dea24ef70fdc36fdd016ee1d63887f35ae698c31cc8a77f'
+'cbe62e86c49dee2430b491295d83c5d08c2e068728f30a0fb714dbaccdd0f48c'
+'4b5a2136f5a84e541f4de1961a5eee0943f0489b7619746d24ac64a118ca4840'
+'bce5d8d04ae8384268cad836a70a103bf3c2464acb3c55aa773fb852e2f49036'
+'8921194e1bfcb377d09cee2652f97f695b1fa79a4c22caa0b95dba04d93b99be'
+'54f94f5f5a7ba560543d77a182def02a06638ea613a60b97065f76370f3beb40'
+)
 
 prepare() {
 	cd "${_srcname}"
@@ -229,7 +242,6 @@ build() {
 	sed -e 's/CONFIG_GENERIC_CPU=y/# CONFIG_GENERIC_CPU is not set/' -e 's/# CONFIG_MCOREAVX2 is not set/CONFIG_MCOREAVX2=y/' \
 -e 's/CONFIG_X86_WP_WORKS_OK=y/CONFIG_X86_WP_WORKS_OK=y\nCONFIG_X86_INTEL_USERCOPY=y\nCONFIG_X86_USE_PPRO_CHECKSUM=y\nCONFIG_X86_P6_NOP=y/' .config > .config.tmp
 	mv -f .config.tmp .config
-	exit 1
   else
     cat .config > "${startdir}/config.last"
   fi
@@ -242,7 +254,8 @@ package_linux-ck() {
 	_Kpkgdesc='Linux Kernel and modules with the ck1 patchset featuring the Brain Fuck Scheduler v0.440.'
 	pkgdesc="${_Kpkgdesc}"
 	depends=('coreutils' 'linux-firmware' 'mkinitcpio>=0.7')
-	optdepends=('crda: to set the correct wireless channels of your country' 'lirc-ck: Linux Infrared Remote Control kernel modules for linux-ck' 'nvidia-ck: nVidia drivers for linux-ck' 'nvidia-beta-ck: nVidia beta drivers for linux-ck' 'modprobed_db: Keeps track of EVERY kernel module that has ever been probed - useful for those of us who make localmodconfig')
+	optdepends=('crda: to set the correct wireless channels of your country' 'lirc-ck: Linux Infrared Remote Control kernel modules for linux-ck' 'nvidia-ck: nVidia drivers for linux-ck' 
+'nvidia-beta-ck: nVidia beta drivers for linux-ck' 'modprobed_db: Keeps track of EVERY kernel module that has ever been probed - useful for those of us who make localmodconfig')
 	provides=("linux-ck=${pkgver}")
 	conflicts=('kernel26-ck' 'linux-ck-corex' 'linux-ck-p4' 'linux-ck-pentm' 'linux-ck-atom' 'linux-ck-core2' 'linux-ck-nehalem' 'linux-ck-sandybridge' 'linux-ck-ivybridge' 'linux-ck-haswell' 'linux-ck-kx' 'linux-ck-k10' 'linux-ck-barcelona' 'linux-ck-bulldozer' 'linux-ck-piledriver')
 	replaces=('kernel26-ck')
