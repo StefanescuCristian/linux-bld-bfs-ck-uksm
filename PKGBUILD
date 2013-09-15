@@ -5,7 +5,7 @@
 ### PATCH AND BUILD OPTIONS
 # Set these variables to ANYTHING that is not null (y or hello or 2 or "I like icecream") to enable them
 #
-_pstates_pat=y   # Enable Haswell support for the new Intel pstate drive
+_pstates_pat=   # Enable Haswell support for the new Intel pstate drive
 _makenconfig=y   # Tweak kernel options prior to a build via nconfig
 _localmodcfg=   # Compile ONLY probed modules
 _use_current=y   # Use the current kernel's .config file
@@ -55,8 +55,8 @@ _NUMAdisable=y  # Disable NUMA in kernel config
 pkgname=linux-ck
 true && pkgname=(linux-ck linux-ck-headers)
 _kernelname=-harfmix
-_srcname=linux-3.10
-pkgver=3.10.6
+_srcname=linux-3.11
+pkgver=3.11.1
 pkgrel=1
 arch=('i686' 'x86_64')
 url="https://wiki.archlinux.org/index.php/Linux-ck"
@@ -64,10 +64,10 @@ license=('GPL2')
 makedepends=('kmod' 'inetutils' 'bc')
 options=('!strip')
 _ckpatchversion=1
-_ckpatchname="patch-3.10-ck${_ckpatchversion}"
-_gcc_patch="kernel-310-gcc48-2.patch"
-_kbase=3.10
-_kpatch=3.10.0
+_ckpatchname="patch-3.11-ck${_ckpatchversion}"
+_gcc_patch="kernel-311-gcc48-1.patch"
+_kbase=3.11
+_kpatch=3.11.0
 _bfqversion=v6r2
 _bfqpath="http://algo.ing.unimo.it/people/paolo/disk_sched/patches/$_kpatch-$_bfqversion"
 _kpatchsum=$(sha256sum patch-$pkgver.xz | awk '{print $1}')
@@ -80,7 +80,7 @@ sed -i "97s/.*/\'$_cksum\'/g" PKGBUILD
 sed -i "98s/.*/\'$_gccsum\'/g" PKGBUILD
 source=("http://www.kernel.org/pub/linux/kernel/v3.x/${_srcname}.tar.xz"
 "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
-"http://ck.kolivas.org/patches/3.0/3.10/3.10-ck${_ckpatchversion}/${_ckpatchname}.bz2"
+"http://ck.kolivas.org/patches/3.0/$_kbase/$_kbase-ck${_ckpatchversion}/${_ckpatchname}.bz2"
 "http://repo-ck.com/source/gcc_patch/${_gcc_patch}.gz"
 'enable_haswell_pstate_driver.patch'
 'linux-ck.preset'
@@ -89,22 +89,22 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/${_srcname}.tar.xz"
 "${_bfqpath}/0001-block-cgroups-kconfig-build-bits-for-BFQ-$_bfqversion-$_kbase.patch"
 "${_bfqpath}/0002-block-introduce-the-BFQ-$_bfqversion-I-O-sched-for-$_kbase.patch"
 "${_bfqpath}/0003-block-bfq-add-Early-Queue-Merge-EQM-to-BFQ-$_bfqversion-for-$_kpatch.patch"
-"https://bld.googlecode.com/files/bld-$_kpatch.patch"
-"https://raw.github.com/sergiuniculescu/configs/master/kernel%20patch/uksm/uksm-0.1.2.2-for-v$_kbase.patch")
+"https://bld.googlecode.com/files/BLD-3.11.0.patch"
+"https://raw.github.com/sergiuniculescu/configs/master/kernel%20patch/uksm/uksm-0.1.2.2-for-v3.10.patch")
 sha256sums=(
-'df27fa92d27a9c410bfe6c4a89f141638500d7eadcca5cce578954efc2ad3544'
-'e17be1ccd6b904d70e3be2b61c16bd4346272c86b5ee1a12ab8d80dcdc7b1487'
-'747d893b69d040dd82650a1a2d509155beace337020619194661049920650ed6'
-'d5fd60f5fae0813eb398b3eac410ce65b8b958360300aa66e1597dc16e9dfe78'
+'803ec8f0ad4b2ddedcb0332a590cd2b5e10dfc57c3b1c95bc9c46af81d51d7f9'
+'516bb3193f868a28e218d1a5c69e145cf0568c62f87496ae7b6446d621e45d8e'
+'aef23aba5e0ea85e11d4b9e009d4ae80fccb7bdc5951ae0ab20a41e7cb88e576'
+'34206de483475d3f4779fb6ed9ead83f66803533eed10994b98239f179046e03'
 'd7fada52453d12a24af9634024c36792697f97ce0bc6552939cd7b2344d00cd9'
 'c2cf8cc2600502de348f3dc3aae9a3bde5486759db15cb8a93df7aa35bd6e7da'
 '56bd99e54429a25a144f2d221718b67f516344ffd518fd7dcdd752206ec5be69'
 '059a8511042a188d283057d3fb27077f3833d987a1b2e3ef4c5bed065184acb3'
 'e6fe236c96aff5f16dea24ef70fdc36fdd016ee1d63887f35ae698c31cc8a77f'
-'cbe62e86c49dee2430b491295d83c5d08c2e068728f30a0fb714dbaccdd0f48c'
-'4b5a2136f5a84e541f4de1961a5eee0943f0489b7619746d24ac64a118ca4840'
-'bce5d8d04ae8384268cad836a70a103bf3c2464acb3c55aa773fb852e2f49036'
-'8921194e1bfcb377d09cee2652f97f695b1fa79a4c22caa0b95dba04d93b99be'
+'10d14a0adc3189b3d2cde5c2d1f94734d4f19744c17ef219d75ed8874969b125'
+'526ac0fa67731e4d60418a8551083a1b8bf2cf3317cac95ad59bda75d342dfd2'
+'5dcbf25a92a597100a7990f4844224f6a711de2a0ca2aaa7d40cc06ea0ef2cc8'
+'e5604a77f0fc0103bda8aeced81f0a1ed365d3892b07a63eb9a2a3d48871daeb'
 '54f94f5f5a7ba560543d77a182def02a06638ea613a60b97065f76370f3beb40'
 )
 
@@ -112,13 +112,13 @@ prepare() {
 	cd "${_srcname}"
 
 	# add upstream patch
-	msg "Patching source to v$pkgver"
+	#msg "Patching source to v$pkgver"
 	patch -p1 -i "${srcdir}/patch-${pkgver}"
 
 	# set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
 	# remove this when a Kconfig knob is made available by upstream
 	# (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
-	patch -Np1 -i "${srcdir}/change-default-console-loglevel.patch"
+	#patch -Np1 -i "${srcdir}/change-default-console-loglevel.patch"
   
 	### Patch source with ck patchset with BFS
 	# Fix double name in EXTRAVERSION
@@ -143,7 +143,7 @@ prepare() {
 	done
 
 	### BLD patch ###
-	patch -Np1 -i "${srcdir}/bld-3.10.0.patch"
+	patch -Np1 -i "${srcdir}/BLD-3.11.0.patch"
 
 	### UKSM ###
 	patch -Np1 -i "${srcdir}/uksm-0.1.2.2-for-v3.10.patch"
@@ -254,9 +254,9 @@ package_linux-ck() {
 	_Kpkgdesc='Linux Kernel and modules with the ck1 patchset featuring the Brain Fuck Scheduler v0.440.'
 	pkgdesc="${_Kpkgdesc}"
 	depends=('coreutils' 'linux-firmware' 'mkinitcpio>=0.7')
-	optdepends=('crda: to set the correct wireless channels of your country' 'lirc-ck: Linux Infrared Remote Control kernel modules for linux-ck' 'nvidia-ck: nVidia drivers for linux-ck' 
-'nvidia-beta-ck: nVidia beta drivers for linux-ck' 'modprobed_db: Keeps track of EVERY kernel module that has ever been probed - useful for those of us who make localmodconfig')
-	provides=("linux-ck=${pkgver}")
+	#optdepends=('crda: to set the correct wireless channels of your country' 'lirc-ck: Linux Infrared Remote Control kernel modules for linux-ck' 'nvidia-ck: nVidia drivers for linux-ck' 
+#'nvidia-beta-ck: nVidia beta drivers for linux-ck' 'modprobed_db: Keeps track of EVERY kernel module that has ever been probed - useful for those of us who make localmodconfig')
+	provides=("linux=${pkgver}")
 	conflicts=('kernel26-ck' 'linux-ck-corex' 'linux-ck-p4' 'linux-ck-pentm' 'linux-ck-atom' 'linux-ck-core2' 'linux-ck-nehalem' 'linux-ck-sandybridge' 'linux-ck-ivybridge' 'linux-ck-haswell' 'linux-ck-kx' 'linux-ck-k10' 'linux-ck-barcelona' 'linux-ck-bulldozer' 'linux-ck-piledriver')
 	replaces=('kernel26-ck')
 	backup=("etc/mkinitcpio.d/linux-ck.preset")
