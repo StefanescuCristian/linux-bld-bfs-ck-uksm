@@ -52,10 +52,10 @@ source=("http://www.kernel.org/pub/linux/kernel/v3.x/${_srcname}.tar.xz"
 "https://bld.googlecode.com/files/BLD-3.11.0.patch"
 "https://raw.github.com/sergiuniculescu/configs/master/kernel%20patch/uksm/uksm-0.1.2.2-for-v3.10.patch")
 sha256sums=(
-'803ec8f0ad4b2ddedcb0332a590cd2b5e10dfc57c3b1c95bc9c46af81d51d7f9'
-'516bb3193f868a28e218d1a5c69e145cf0568c62f87496ae7b6446d621e45d8e'
-'aef23aba5e0ea85e11d4b9e009d4ae80fccb7bdc5951ae0ab20a41e7cb88e576'
-'34206de483475d3f4779fb6ed9ead83f66803533eed10994b98239f179046e03'
+''
+''
+''
+''
 'd7fada52453d12a24af9634024c36792697f97ce0bc6552939cd7b2344d00cd9'
 'c2cf8cc2600502de348f3dc3aae9a3bde5486759db15cb8a93df7aa35bd6e7da'
 '56bd99e54429a25a144f2d221718b67f516344ffd518fd7dcdd752206ec5be69'
