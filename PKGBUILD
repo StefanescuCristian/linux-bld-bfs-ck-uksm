@@ -2,62 +2,22 @@
 # Contributor: Tobias Powalowski <tpowa@archlinux.org>
 # Contributor: Thomas Baechler <thomas@archlinux.org>
 
-### PATCH AND BUILD OPTIONS
 # Set these variables to ANYTHING that is not null (y or hello or 2 or "I like icecream") to enable them
 #
 _pstates_pat=   # Enable Haswell support for the new Intel pstate drive
-_makenconfig=y   # Tweak kernel options prior to a build via nconfig
-_localmodcfg=   # Compile ONLY probed modules
+_makenconfig=   # Tweak kernel options prior to a build via nconfig
+_localmodcfg=y   # Compile ONLY probed modules
 _use_current=y   # Use the current kernel's .config file
 _BFQ_enable_=y   # Enable BFQ as the default I/O scheduler
 _NUMAdisable=y  # Disable NUMA in kernel config
-
-### DOCS
-# Starting with the 3.6.9-3 release, this package ships with the kernel-3x-gcc47-x.patch.
-# This allows users an expanded scope of CPU specific options.
-# Consult the following resources to understand which option is right for you application:
-#
-# http://en.gentoo-wiki.com/wiki/Safe_Cflags/Intel
-# http://en.gentoo-wiki.com/wiki/Safe_Cflags/AMD
-# http://www.linuxforge.net/docs/linux/linux-gcc.php
-# http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html
-
-# DETAILS FOR _pstates_pat
-# Enable pstate driver for Haswell CPUs. Patch for Sandy/Ivy is included in 3.10 upstream.
-# Not sure when the Haswell support is planned but several Arch users have been using this code
-# without problems for several weeks.
-# See https://plus.google.com/117091380454742934025/posts/2vEekAsG2QT for a discussion.
-#
-# DETAILS FOR _localmodcfg=
-# As of mainline 2.6.32, running with this option will only build the modules that you currently have
-# probed in your system VASTLY reducing the number of modules built and the build time to do it.
-#
-# WARNING - make CERTAIN that all modules are modprobed BEFORE you begin making the pkg!
-#
-# To keep track of which modules are needed for your specific system/hardware, give my module_db script
-# a try: http://aur.archlinux.org/packages.php?ID=41689  Note that if you use my script, this PKGBUILD
-# will auto run the 'sudo modprobed_db reload' for you to probe all the modules you have logged!
-#
-# More at this wiki page ---> https://wiki.archlinux.org/index.php/Modprobed_db
-
-# DETAILS FOR _use_current=
-# Enabling this option will use the .config of the RUNNING kernel rather than the ARCH defaults.
-# Useful when the package gets updated and you already went through the trouble of customizing your
-# config options.  NOT recommended when a new kernel is released, but again, convenient for package bumps.
-
-# DETAILS FOR _BFQ_enable=
-# Alternative I/O scheduler by Paolo.  For more, see: http://algo.ing.unimo.it/people/paolo/disk_sched/
-
-# DETAILS FOR _NUMAdisable=
-# Since >99 % of users do not have multiple CPUs but do have multiple cores in one CPU.
-# see, https://bugs.archlinux.org/task/31187
+_1k_HZ_ticks=y  #Enable 1000Hz tickrate
 
 pkgname=linux-ck
 true && pkgname=(linux-ck linux-ck-headers)
 _kernelname=-harfmix
 _srcname=linux-3.11
 pkgver=3.11.1
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url="https://wiki.archlinux.org/index.php/Linux-ck"
 license=('GPL2')
@@ -74,10 +34,10 @@ _kpatchsum=$(sha256sum patch-$pkgver.xz | awk '{print $1}')
 _kbasesum=$(sha256sum $_srcname.tar.xz | awk '{print $1}')
 _cksum=$(sha256sum ${_ckpatchname}.bz2 | awk '{print $1}')
 _gccsum=$(sha256sum $_gcc_patch.gz | awk '{print $1}')
-sed -i "95s/.*/\'$_kbasesum\'/g" PKGBUILD
-sed -i "96s/.*/\'$_kpatchsum\'/g" PKGBUILD
-sed -i "97s/.*/\'$_cksum\'/g" PKGBUILD
-sed -i "98s/.*/\'$_gccsum\'/g" PKGBUILD
+sed -i "55s/.*/\'$_kbasesum\'/g" PKGBUILD
+sed -i "56s/.*/\'$_kpatchsum\'/g" PKGBUILD
+sed -i "57s/.*/\'$_cksum\'/g" PKGBUILD
+sed -i "58s/.*/\'$_gccsum\'/g" PKGBUILD
 source=("http://www.kernel.org/pub/linux/kernel/v3.x/${_srcname}.tar.xz"
 "http://www.kernel.org/pub/linux/kernel/v3.x/patch-${pkgver}.xz"
 "http://ck.kolivas.org/patches/3.0/$_kbase/$_kbase-ck${_ckpatchversion}/${_ckpatchname}.bz2"
@@ -115,9 +75,7 @@ prepare() {
 	#msg "Patching source to v$pkgver"
 	patch -p1 -i "${srcdir}/patch-${pkgver}"
 
-	# set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
-	# remove this when a Kconfig knob is made available by upstream
-	# (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
+	# set DEFAULT_CONSOLE_LOGLEVEL to 4
 	#patch -Np1 -i "${srcdir}/change-default-console-loglevel.patch"
   
 	### Patch source with ck patchset with BFS
@@ -126,9 +84,9 @@ prepare() {
 	msg "Patching source with ck1 including BFS v0.440"
 	patch -Np1 -i "${srcdir}/${_ckpatchname}"
 
+    ### Patch source to enable pstate drivers with ivybridge CPUs
+	### see https://plus.google.com/117091380454742934025/posts/2vEekAsG2QT
 	if [ -n "$_pstates_pat" ]; then
-		### Patch source to enable pstate drivers with ivybridge CPUs
-		### see https://plus.google.com/117091380454742934025/posts/2vEekAsG2QT
 		msg "Patching source to enable Intel Pstate driver for Haswell CPUs"
 		patch -Np1 -i "${srcdir}/enable_haswell_pstate_driver.patch"
 	fi
@@ -156,6 +114,15 @@ prepare() {
 		cat "${srcdir}/config.x86_64" > ./.config
 	else
 		cat "${srcdir}/config" > ./.config
+	fi
+
+    ### Optionally set tickrate to 1000 to avoid suspend issues as reported here:
+	# http://ck-hack.blogspot.com/2013/09/bfs-0441-311-ck1.html?showComment=1379234249615#c4156123736313039413
+	if [ -n "$_1k_HZ_ticks" ]; then
+	msg "Setting tick rate to 1k..."
+		sed -i -e 's/^CONFIG_HZ_300=y/# CONFIG_HZ_300 is not set/' \
+			-i -e 's/^# CONFIG_HZ_1000 is not set/CONFIG_HZ_1000=y/' \
+			-i -e 's/^CONFIG_HZ=300/CONFIG_HZ=1000/' .config
 	fi
 
 	### Optionally use running kernel's config
